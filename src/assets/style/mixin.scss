@@ -1,0 +1,3 @@
+// 全局函数/混入
+// 使用var内的变量时需要添加前缀var.xxxx
+@use "./var" as var;

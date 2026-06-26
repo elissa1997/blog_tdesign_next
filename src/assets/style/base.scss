@@ -1,0 +1,15 @@
+// 全局基础样式
+// 使用var内的变量时需要添加前缀var.xxxx
+// 使用mixin内的方法时需要添加前缀mixin.xxxx
+@use "./var" as var;
+@use "./mixin" as mixin;
+
+body {
+  margin: 0;
+}
+
+.esri-view .esri-view-surface:focus:after {
+  outline: auto 0px Highlight !important;
+  outline: auto 0px -webkit-focus-ring-color !important;
+  content: unset;
+}
