@@ -72,9 +72,21 @@ const props = defineProps({
     type: Number,
     default: 1.5
   },
+  opacity: {
+    type: Number,
+    default: 1
+  },
   bandWidth: {
     type: Number,
     default: 6
+  },
+  fadeTop: {
+    type: Number,
+    default: 0
+  },
+  normalizeTransparentColor: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -98,7 +110,10 @@ uniform float uParallax;
 uniform float uNoise;
 uniform int uIterations;
 uniform float uIntensity;
+uniform float uOpacity;
 uniform float uBandWidth;
+uniform float uFadeTop;
+uniform int uNormalizeTransparentColor;
 varying vec2 vUv;
 
 void main() {
@@ -143,6 +158,9 @@ void main() {
       cover = max(cover, w);
     }
     col = clamp(sumCol, 0.0, 1.0);
+    if (uNormalizeTransparentColor > 0 && cover > 0.0001) {
+      col /= cover;
+    }
     a = uTransparent > 0 ? cover : 1.0;
   } else {
     vec2 s = q;
@@ -170,7 +188,11 @@ void main() {
     col = clamp(col, 0.0, 1.0);
   }
 
-  vec3 rgb = (uTransparent > 0) ? col * a : col;
+  float topFade = uFadeTop > 0.0
+    ? smoothstep(0.0, max(uFadeTop, 0.0001), 1.0 - vUv.y)
+    : 1.0;
+  a *= topFade * clamp(uOpacity, 0.0, 1.0);
+  vec3 rgb = (uTransparent > 0) ? col * a : col * topFade;
   gl_FragColor = vec4(rgb, a);
 }
 `
@@ -224,7 +246,10 @@ const init = () => {
       uNoise: { value: props.noise },
       uIterations: { value: props.iterations },
       uIntensity: { value: props.intensity },
-      uBandWidth: { value: props.bandWidth }
+      uOpacity: { value: props.opacity },
+      uBandWidth: { value: props.bandWidth },
+      uFadeTop: { value: props.fadeTop },
+      uNormalizeTransparentColor: { value: props.normalizeTransparentColor ? 1 : 0 }
     },
     premultipliedAlpha: true,
     transparent: true
@@ -297,12 +322,20 @@ const init = () => {
   container.addEventListener('pointermove', handlePointerMove)
 
   cleanup = () => {
-    if (rafRef.value !== null) cancelAnimationFrame(rafRef.value)
-    if (resizeObserverRef.value) resizeObserverRef.value.disconnect()
-    else window.removeEventListener('resize', handleResize)
+    if (rafRef.value !== null) {
+      cancelAnimationFrame(rafRef.value)
+      rafRef.value = null
+    }
 
+    container.removeEventListener('pointermove', handlePointerMove)
+    window.removeEventListener('resize', handleResize)
+    resizeObserverRef.value?.disconnect()
+    resizeObserverRef.value = null
+
+    scene.remove(mesh)
     geometry.dispose()
     material.dispose()
+    renderer.renderLists.dispose()
     renderer.dispose()
     renderer.forceContextLoss()
 
@@ -310,7 +343,11 @@ const init = () => {
       container.removeChild(renderer.domElement)
     }
 
-    container.removeEventListener('pointermove', handlePointerMove)
+    materialRef.value = null
+    rendererRef.value = null
+    pointerTargetRef.value.set(0, 0)
+    pointerCurrentRef.value.set(0, 0)
+    cleanup = null
   }
 }
 
@@ -330,7 +367,10 @@ const applyProps = () => {
   material.uniforms.uNoise.value = props.noise
   material.uniforms.uIterations.value = props.iterations
   material.uniforms.uIntensity.value = props.intensity
+  material.uniforms.uOpacity.value = Math.max(0, Math.min(props.opacity, 1))
   material.uniforms.uBandWidth.value = props.bandWidth
+  material.uniforms.uFadeTop.value = Math.max(0, Math.min(props.fadeTop, 1))
+  material.uniforms.uNormalizeTransparentColor.value = props.normalizeTransparentColor ? 1 : 0
 
   const toVec3 = (hex) => {
     const h = hex.replace('#', '').trim()
@@ -375,7 +415,10 @@ watch(
     props.noise,
     props.iterations,
     props.intensity,
+    props.opacity,
     props.bandWidth,
+    props.fadeTop,
+    props.normalizeTransparentColor,
     props.colors,
     props.transparent
   ],
