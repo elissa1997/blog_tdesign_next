@@ -1,10 +1,10 @@
 <script setup>
 import headerNav from '@/components/headerNav.vue'
-import GradientBackground from '@/components/GradientBackground/index.vue'
+import vuebits from '@/components/vuebits/vuebits.vue'
 </script>
 
 <template>
-  <GradientBackground />
+  <vuebits />
   <headerNav />
   <router-view />
 </template>
