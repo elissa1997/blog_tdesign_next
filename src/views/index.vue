@@ -4,14 +4,10 @@ import dayjs from 'dayjs'
 import { CalendarIcon, FolderIcon } from 'tdesign-icons-vue-next'
 import { list } from '@/network/article.js'
 import { getDictItems, getDictLabel } from '@/util/dict.js'
-import { stripMarkdown } from '@/util/tools.js'
+import { getImgUrl, stripMarkdown } from '@/util/tools.js'
+import {useRouter} from "vue-router";
+const router = useRouter();
 
-const defaultCoverModules = import.meta.glob(
-  '../assets/img/defaultCover/*.jpg',
-  { eager: true, query: '?url', import: 'default' }
-)
-const defaultCovers = Object.values(defaultCoverModules)
-const getDefaultCover = (id) => defaultCovers[Math.abs(Number(id) || 0) % defaultCovers.length]
 const formatDate = (date) => dayjs(date).format('YYYY-MM-DD')
 const getPreview = (content) => stripMarkdown(content)
 const getCategoryName = (value) => getDictLabel(categoryDict.value, value, '未分类')
@@ -52,6 +48,15 @@ const onPaginationChange = ({ current, pageSize }) => {
   getArticleList()
 }
 
+const gotoArticle = (item) => {
+  router.push({
+    path: '/article',
+    query: {
+      id: item.id
+    }
+  })
+}
+
 onMounted(async () => {
   const [, dictResult] = await Promise.allSettled([
     getArticleList(),
@@ -82,10 +87,10 @@ onMounted(async () => {
           </template>
 
           <template v-else-if="articleList.length > 0">
-            <article class="card" v-for="item in articleList" :key="item.id">
+            <article class="card" v-for="item in articleList" :key="item.id" @click="gotoArticle(item)">
               <img
                   class="cover"
-                  :src="item.cover || getDefaultCover(item.id)"
+                  :src="item.cover || getImgUrl(`defaultCover/coverbg${Math.floor(Math.random() * 3) + 1}.jpg`)"
                   :alt="`${item.title}封面`"
               >
               <div class="card-content">

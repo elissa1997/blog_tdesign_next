@@ -8,7 +8,22 @@ const routes = [
   {
     path: '/index',
     name: 'Index',
+    meta: {
+      auth: false,
+      name: '首页',
+      active: ['Index']
+    },
     component: () => import('@/views/index.vue')
+  },
+  {
+    path: '/article',
+    name: 'Article',
+    meta: {
+      auth: false,
+      name: '',
+      active: []
+    },
+    component: () => import('@/views/article.vue')
   }
 ]
 

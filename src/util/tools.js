@@ -1,16 +1,17 @@
+const imageModules = import.meta.glob(
+    '../assets/img/**/*.{png,jpg,jpeg,webp,gif,svg}',
+    { eager: true, query: '?url', import: 'default' }
+)
+
 /**
- * 获取 src/assets/img 目录下的图片
+ * 获取 src/assets/img 目录下的图片。
  *
  * @param {string} path 相对于 src/assets/img 的路径
  * @returns {string}
- *
- * @example
- * getImgUrl('logo.png')
- * getImgUrl('defaultCover/coverbg1.jpg')
- * getImgUrl(`defaultCover/${name}.jpg`)
  */
 export function getImgUrl(path) {
-    return new URL(`../assets/img/${path}`, import.meta.url).href
+    const normalizedPath = String(path).replaceAll('\\', '/').replace(/^\/+/, '')
+    return imageModules[`../assets/img/${normalizedPath}`] || ''
 }
 
 /**
