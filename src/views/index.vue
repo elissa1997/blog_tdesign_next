@@ -76,8 +76,8 @@ onMounted(async () => {
           :xs="{ offset: 0, span: 12 }"
           :sm="{ offset: 0, span: 12 }"
           :md="{ offset: 2, span: 8 }"
-          :lg="{ offset: 4, span: 4 }"
-          :xl="{ offset: 4, span: 4 }"
+          :lg="{ offset: 3, span: 6 }"
+          :xl="{ offset: 3, span: 6 }"
       >
         <div class="cardWarp">
           <template v-if="loading">
