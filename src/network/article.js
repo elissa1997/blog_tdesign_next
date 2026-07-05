@@ -1,11 +1,11 @@
 import { instance_api } from '@/network/axios.js'
-import Cookies from 'js-cookie';
 
 export function list(params) {
   return instance_api({
     url: import.meta.env.VITE_APP_API+'/article/list',
     method: 'get',
-    params
+    params,
+    auth: false,
   })
 }
 
@@ -13,7 +13,8 @@ export function detail(params) {
   return instance_api({
     url: import.meta.env.VITE_APP_API+'/article/detail',
     method: 'get',
-    params
+    params,
+    auth: false,
   })
 }
 
@@ -22,7 +23,7 @@ export function detail(params) {
 //     url: import.meta.env.VITE_APP_API+'/article/add',
 //     method: 'post',
 //     data,
-//     headers: {'Authorization': 'Bearer ' + Cookies.get('token')}
+//     auth: true,
 //   })
 // }
 //
@@ -31,7 +32,7 @@ export function detail(params) {
 //     url: import.meta.env.VITE_APP_API+'/article/update',
 //     method: 'post',
 //     data,
-//     headers: {'Authorization': 'Bearer ' + Cookies.get('token')}
+//     auth: true,
 //   })
 // }
 //
@@ -40,6 +41,6 @@ export function detail(params) {
 //     url: import.meta.env.VITE_APP_API+'/article/delete',
 //     method: 'post',
 //     data,
-//     headers: {'Authorization': 'Bearer ' + Cookies.get('token')}
+//     auth: true,
 //   })
 // }

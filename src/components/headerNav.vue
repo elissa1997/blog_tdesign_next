@@ -1,7 +1,7 @@
 <script setup>
-import {onMounted, ref} from 'vue'
-import { useRouter } from 'vue-router';
-import {MenuApplicationIcon, ModeDarkIcon, ModeLightIcon} from 'tdesign-icons-vue-next'
+import {computed, onMounted, ref} from 'vue'
+import { useRoute, useRouter } from 'vue-router';
+import {MenuApplicationIcon, ModeDarkIcon, ModeLightIcon} from 'tdesign-icons-vue-next';
 
 const theme = ref('light')
 const themeChange = (val) => {
@@ -15,24 +15,33 @@ const themeChange = (val) => {
   }
 }
 
-const navList = [
-  {
-    value: '/index',
-    type: 'inner',
-    label: '主页'
-  },
-  {
-    value: 'https://smartping.makedream.site/',
-    type: 'outer',
-    label: '网络监测'
-  },
-  {
-    value: 'https://pan.makedream.site/',
-    type: 'outer',
-    label: '存储'
-  }
-]
+// const navList = [
+//   {
+//     value: '/index',
+//     type: 'inner',
+//     label: '主页'
+//   },
+//   {
+//     value: 'https://smartping.makedream.site/',
+//     type: 'outer',
+//     label: '网络监测'
+//   },
+//   {
+//     value: 'https://pan.makedream.site/',
+//     type: 'outer',
+//     label: '存储'
+//   }
+// ]
+
+let navList = ref([])
+
 const router = useRouter()
+const route = useRoute()
+const activeNavName = computed(() => {
+  const active = route.meta.active
+  return Array.isArray(active) ? active[0] : undefined
+})
+
 const menuClick = (item) => {
   if (item.type === 'inner') {
     router.push(item.value)
@@ -42,6 +51,17 @@ const menuClick = (item) => {
 }
 
 const mobileNavOpen = ref(false)
+
+onMounted(() => {
+  navList.value = router.getRoutes().filter(item => item.meta && item.meta.label).map(item => {
+    return {
+      value: item.path,
+      name: item.name,
+      type: 'inner',
+      label: item.meta.label
+    }
+  })
+})
 </script>
 
 <template>
@@ -50,7 +70,13 @@ const mobileNavOpen = ref(false)
     <img src="@/assets/img/logo.png" class="logo" />
 
     <div class="navWarp" :class="mobileNavOpen? 'mobileNavOpen':'mobileNavClose'">
-      <div class="navItem" v-for="item in navList" :key="item.value" @click="menuClick(item)">{{item.label}}</div>
+      <div
+        class="navItem"
+        :class="{ active: item.name === activeNavName }"
+        v-for="item in navList"
+        :key="item.value"
+        @click="menuClick(item)"
+      >{{item.label}}</div>
     </div>
 
     <div class="meta">
@@ -144,6 +170,11 @@ const mobileNavOpen = ref(false)
         cursor: pointer;
         width: 100%;
       }
+
+      .navItem.active {
+        color: var(--nav-item-font-color);
+        //background-color: var(--nav-item-bg);
+      }
     }
 
     @include respond-to('desktop') {
@@ -167,6 +198,11 @@ const mobileNavOpen = ref(false)
       }
 
       .navItem:hover {
+        color: var(--nav-item-font-color);
+        background-color: var(--nav-item-bg);
+      }
+
+      .navItem.active {
         color: var(--nav-item-font-color);
         background-color: var(--nav-item-bg);
       }
