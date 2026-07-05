@@ -1,4 +1,4 @@
-import { instance_api } from '@/network/axios.js'
+import { findByType } from '@/network/dict.js'
 
 const DEFAULT_PAGE = 1
 const DEFAULT_PAGE_SIZE = 100
@@ -20,14 +20,10 @@ export async function getDictItems(
     throw new TypeError('dictType 必须是非空字符串')
   }
 
-  const response = await instance_api({
-    url: `${import.meta.env.VITE_APP_API}/dict/findbytype`,
-    method: 'get',
-    params: {
-      dict_type: dictType.trim(),
-      offset,
-      limits,
-    },
+  const response = await findByType({
+    dict_type: dictType.trim(),
+    offset,
+    limits,
   })
 
   if (response?.status !== 200 || !Array.isArray(response?.data?.list)) {
