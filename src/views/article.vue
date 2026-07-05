@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 import { CalendarIcon, FolderIcon } from 'tdesign-icons-vue-next'
 import {getDictItems, getDictLabel} from "../util/dict.js";
 import markdownPreview from "@/components/MarkdownPreview/index.vue";
-
+import ArticleComment from "@/components/ArticleComment/index.vue"
 const route = useRoute()
 const formatDate = (date) => dayjs(date).format('YYYY-MM-DD')
 const getCategoryName = (value) => getDictLabel(categoryDict.value, value, '未分类')
@@ -77,6 +77,10 @@ onMounted(async () => {
           </div>
         </div>
 
+        <div class="commentWarp">
+          <ArticleComment :article-id="articleDetail.id" />
+        </div>
+
       </t-col>
     </t-row>
   </div>
@@ -143,6 +147,11 @@ onMounted(async () => {
       box-sizing: border-box;
       background-color: var(--td-bg-color-container);
     }
+  }
+
+  .commentWarp {
+    padding: var(--td-comp-paddingTB-s) var(--td-comp-paddingLR-s);
+    box-sizing: border-box;
   }
 }
 </style>
