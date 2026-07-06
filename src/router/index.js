@@ -55,7 +55,59 @@ const routes = [
       label: '后台',
       active: ['Admin']
     },
-    component: () => import('@/views/admin/index.vue')
+    component: () => import('@/views/admin/index.vue'),
+    children: [
+      {
+        path: 'articlelist',
+        name: 'Admin-Article-list',
+        meta: {
+          auth: true,
+          label: '文章管理',
+          active: ['Admin', 'Article']
+        },
+        component: () => import('@/views/admin/ArticleManage/list.vue'),
+      },
+      {
+        path: 'articleedit',
+        name: 'Admin-Article-edit',
+        meta: {
+          auth: true,
+          label: '',
+          active: ['Admin', 'Article']
+        },
+        component: () => import('@/views/admin/ArticleManage/edit.vue'),
+      },
+      {
+        path: 'commentlist',
+        name: 'Admin-Comment-list',
+        meta: {
+          auth: true,
+          label: '评论管理',
+          active: ['Admin', 'Comment']
+        },
+        component: () => import('@/views/admin/CommentManage/list.vue'),
+      },
+      {
+        path: 'othercommentlist',
+        name: 'Admin-OtherComment-List',
+        meta: {
+          auth: true,
+          label: '其他评论管理',
+          active: ['Admin', 'OtherComment']
+        },
+        component: () => import('@/views/admin/otherComment/list.vue'),
+      },
+      {
+        path: 'dictlist',
+        name: 'Admin-Dict-List',
+        meta: {
+          auth: true,
+          label: '字典管理',
+          active: ['Admin', 'Dict']
+        },
+        component: () => import('@/views/admin/DictManage/list.vue'),
+      },
+    ]
   }
 ]
 

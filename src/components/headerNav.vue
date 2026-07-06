@@ -15,24 +15,6 @@ const themeChange = (val) => {
   }
 }
 
-// const navList = [
-//   {
-//     value: '/index',
-//     type: 'inner',
-//     label: '主页'
-//   },
-//   {
-//     value: 'https://smartping.makedream.site/',
-//     type: 'outer',
-//     label: '网络监测'
-//   },
-//   {
-//     value: 'https://pan.makedream.site/',
-//     type: 'outer',
-//     label: '存储'
-//   }
-// ]
-
 let navList = ref([])
 
 const router = useRouter()
@@ -53,7 +35,7 @@ const menuClick = (item) => {
 const mobileNavOpen = ref(false)
 
 onMounted(() => {
-  navList.value = router.getRoutes().filter(item => item.meta && item.meta.label).map(item => {
+  navList.value = router.getRoutes().filter(item => !(item.path.includes('/admin/'))).filter(item => item.meta && item.meta.label).map(item => {
     return {
       value: item.path,
       name: item.name,
