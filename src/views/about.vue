@@ -1,10 +1,12 @@
 <script setup>
 import {
+  CodeIcon,
   LaptopIcon,
   LocationIcon,
   UserIcon,
 } from 'tdesign-icons-vue-next'
 import avatarImg from '@/assets/img/logo.png'
+import { getImgUrl } from '@/util/tools.js'
 
 const profile = {
   avatar: avatarImg,
@@ -14,6 +16,14 @@ const profile = {
   location: '中国',
   summary: '关注前端工程化、交互体验和可维护的业务系统建设，喜欢把复杂需求拆成稳定、清晰的产品界面。',
 }
+
+const skills = [
+  { name: 'Vue / Vite', percent: 90, color: 'var(--td-brand-color)', icon: getImgUrl('logo.png') },
+  { name: 'JavaScript / TypeScript', percent: 86, color: 'var(--td-success-color)', icon: getImgUrl('logo.png') },
+  { name: 'TDesign / UI 实现', percent: 82, color: 'var(--td-warning-color)', icon: getImgUrl('logo.png') },
+  { name: 'Node.js / 接口联调', percent: 72, color: 'var(--td-brand-color)', icon: getImgUrl('logo.png') },
+  { name: '工程化 / 性能优化', percent: 78, color: 'var(--td-success-color)', icon: getImgUrl('logo.png') },
+]
 </script>
 
 <template>
@@ -53,6 +63,34 @@ const profile = {
               </div>
             </div>
           </section>
+
+          <section class="skills-card panel">
+            <div class="section-title">
+              <code-icon />
+              <h2>个人技能</h2>
+            </div>
+            <div class="skill-list">
+              <div class="skill-item" v-for="skill in skills" :key="skill.name">
+                <div class="skill-icon">
+                  <img :src="skill.icon" :alt="`${skill.name}图标`">
+                </div>
+                <div class="skill-content">
+                  <div class="skill-top">
+                    <span>{{ skill.name }}</span>
+                    <strong>{{ skill.percent }}%</strong>
+                  </div>
+                  <t-progress
+                    :percentage="skill.percent"
+                    :color="skill.color"
+                    :label="false"
+                    theme="line"
+                    size="small"
+                    track-color="var(--td-bg-color-secondarycontainer)"
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
       </t-col>
     </t-row>
@@ -84,7 +122,8 @@ const profile = {
     box-sizing: border-box;
   }
 
-  .profile-card {
+  .profile-card,
+  .skills-card {
     margin-bottom: var(--td-comp-margin-xl);
   }
 
@@ -141,6 +180,86 @@ const profile = {
     }
   }
 
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: var(--td-comp-margin-s);
+    color: var(--td-text-color-primary);
+    margin-bottom: var(--td-comp-margin-l);
+
+    h2 {
+      font: var(--td-font-title-medium);
+      margin: 0;
+    }
+  }
+
+  .skill-list {
+    display: grid;
+    gap: var(--td-comp-margin-l);
+  }
+
+  .skill-item {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr);
+    align-items: center;
+    gap: var(--td-comp-margin-m);
+    padding: var(--td-comp-paddingTB-m) var(--td-comp-paddingLR-m);
+    border: 1px solid var(--td-component-border);
+    border-radius: var(--td-radius-medium);
+    background-color: var(--td-bg-color-secondarycontainer);
+  }
+
+  .skill-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+
+    img {
+      display: block;
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+    }
+  }
+
+  .skill-content {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .skill-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--td-comp-margin-m);
+    color: var(--td-text-color-primary);
+    font: var(--td-font-body-medium);
+    margin-bottom: var(--td-comp-margin-s);
+
+    span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    strong {
+      flex-shrink: 0;
+      color: var(--td-text-color-secondary);
+      font: var(--td-font-body-small);
+    }
+  }
+
+  @include respond-to('desktop') {
+    .skill-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
   @include respond-to('phone') {
     .panel {
       padding: var(--td-comp-paddingTB-l) var(--td-comp-paddingLR-l);
@@ -154,6 +273,20 @@ const profile = {
 
     .avatar {
       align-self: flex-start;
+    }
+
+    .skill-list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .skill-item {
+      grid-template-columns: 36px minmax(0, 1fr);
+      padding: var(--td-comp-paddingTB-s) var(--td-comp-paddingLR-s);
+    }
+
+    .skill-icon {
+      width: 36px;
+      height: 36px;
     }
   }
 }
