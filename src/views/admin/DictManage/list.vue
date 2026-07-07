@@ -397,6 +397,7 @@ onBeforeUnmount(stopHeightObserver)
           :loading="loading"
           :pagination="pagination"
           :reserve-selected-row-on-paginate="true"
+          size="small"
           table-layout="fixed"
           bordered
           resizable
@@ -418,11 +419,11 @@ onBeforeUnmount(stopHeightObserver)
 
           <template #operation="{ row }">
             <t-space size="small">
-              <t-button theme="primary" @click="onEdit(row)">编辑</t-button>
-              <t-button theme="default" variant="outline" @click="onEditType(row)">
+              <t-button theme="primary" size="small" @click="onEdit(row)">编辑</t-button>
+              <t-button theme="default" variant="outline" size="small" @click="onEditType(row)">
                 编辑类型
               </t-button>
-              <t-button theme="danger" @click="onDelete(row)">删除</t-button>
+              <t-button theme="danger" size="small" @click="onDelete(row)">删除</t-button>
             </t-space>
           </template>
         </t-table>

@@ -356,6 +356,7 @@ onBeforeUnmount(stopHeightObserver)
           :loading="loading"
           :pagination="pagination"
           :reserve-selected-row-on-paginate="true"
+          size="small"
           table-layout="fixed"
           bordered
           resizable
@@ -375,6 +376,7 @@ onBeforeUnmount(stopHeightObserver)
                 v-for="option in getAvailableStatusOptions(row.status)"
                 :key="option.value"
                 :theme="Number(option.value) === 1 ? 'success' : 'default'"
+                size="small"
                 :loading="updatingIds.includes(row.id)"
                 :disabled="updatingIds.includes(row.id)"
                 @click="onStatusChange(row, option.value)"
@@ -383,6 +385,7 @@ onBeforeUnmount(stopHeightObserver)
               </t-button>
               <t-button
                 theme="danger"
+                size="small"
                 :disabled="updatingIds.includes(row.id)"
                 @click="openDeleteDialog([row.id])"
               >
