@@ -6,6 +6,9 @@ import {
   UserIcon,
 } from 'tdesign-icons-vue-next'
 import avatarImg from '@/assets/img/logo.png'
+import coverOne from '@/assets/img/defaultCover/coverbg1.jpg'
+import coverTwo from '@/assets/img/defaultCover/coverbg2.jpg'
+import coverThree from '@/assets/img/defaultCover/coverbg3.jpg'
 import { getImgUrl } from '@/util/tools.js'
 
 const profile = {
@@ -23,6 +26,39 @@ const skills = [
   { name: 'TDesign / UI 实现', percent: 82, color: 'var(--td-warning-color)', icon: getImgUrl('logo.png') },
   { name: 'Node.js / 接口联调', percent: 72, color: 'var(--td-brand-color)', icon: getImgUrl('logo.png') },
   { name: '工程化 / 性能优化', percent: 78, color: 'var(--td-success-color)', icon: getImgUrl('logo.png') },
+]
+
+const projects = [
+  {
+    name: '个人技术博客',
+    image: coverOne,
+    tags: ['Vue 3', 'TDesign', 'Markdown'],
+    points: [
+      '负责文章列表、详情阅读和评论交互的页面搭建',
+      '接入 Markdown 渲染、代码高亮和分类字典展示',
+      '统一响应式布局，在移动端保持稳定阅读体验',
+    ],
+  },
+  {
+    name: '后台内容管理系统',
+    image: coverTwo,
+    tags: ['Admin', 'CRUD', 'Auth'],
+    points: [
+      '实现文章、评论和字典等核心管理模块',
+      '封装接口请求与权限守卫，减少页面重复逻辑',
+      '优化表单编辑、分页列表和数据加载状态',
+    ],
+  },
+  {
+    name: '可视化展示页面',
+    image: coverThree,
+    tags: ['Data', 'Responsive', 'UX'],
+    points: [
+      '参与页面信息架构与组件拆分',
+      '结合业务数据设计卡片、图表和状态提示',
+      '兼顾桌面端展示密度与移动端触控体验',
+    ],
+  },
 ]
 </script>
 
@@ -91,6 +127,37 @@ const skills = [
               </div>
             </div>
           </section>
+
+          <section class="projects-section">
+            <div class="section-title">
+              <laptop-icon />
+              <h2>项目经历</h2>
+            </div>
+            <div class="project-list">
+              <article class="project-card" v-for="project in projects" :key="project.name">
+                <img class="project-cover" :src="project.image" :alt="`${project.name}封面`">
+                <div class="project-content">
+                  <div class="project-head">
+                    <h3>{{ project.name }}</h3>
+                    <t-space size="small" break-line>
+                      <t-tag
+                        v-for="tag in project.tags"
+                        :key="tag"
+                        theme="primary"
+                        variant="light"
+                        size="small"
+                      >
+                        {{ tag }}
+                      </t-tag>
+                    </t-space>
+                  </div>
+                  <ul>
+                    <li v-for="point in project.points" :key="point">{{ point }}</li>
+                  </ul>
+                </div>
+              </article>
+            </div>
+          </section>
         </div>
       </t-col>
     </t-row>
@@ -104,7 +171,8 @@ const skills = [
     box-sizing: border-box;
   }
 
-  .panel {
+  .panel,
+  .project-card {
     overflow: hidden;
     border-radius: var(--td-radius-medium);
     background-color: var(--td-bg-color-container);
@@ -123,7 +191,8 @@ const skills = [
   }
 
   .profile-card,
-  .skills-card {
+  .skills-card,
+  .projects-section {
     margin-bottom: var(--td-comp-margin-xl);
   }
 
@@ -254,8 +323,63 @@ const skills = [
     }
   }
 
+  .project-list {
+    display: grid;
+    gap: var(--td-comp-margin-xl);
+    align-items: stretch;
+    grid-auto-rows: 1fr;
+  }
+
+  .project-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .project-cover {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  .project-content {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: var(--td-comp-paddingTB-l) var(--td-comp-paddingLR-l);
+    box-sizing: border-box;
+  }
+
+  .project-head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--td-comp-margin-s);
+    margin-bottom: var(--td-comp-margin-m);
+
+    h3 {
+      color: var(--td-text-color-primary);
+      font: var(--td-font-title-medium);
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 1.2em;
+    color: var(--td-text-color-secondary);
+    font: var(--td-font-body-medium);
+    line-height: var(--td-line-height-body-medium);
+  }
+
+  li:not(:last-child) {
+    margin-bottom: var(--td-comp-margin-s);
+  }
+
   @include respond-to('desktop') {
-    .skill-list {
+    .skill-list,
+    .project-list {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
@@ -275,8 +399,13 @@ const skills = [
       align-self: flex-start;
     }
 
-    .skill-list {
+    .skill-list,
+    .project-list {
       grid-template-columns: minmax(0, 1fr);
+    }
+
+    .project-list {
+      grid-auto-rows: auto;
     }
 
     .skill-item {
