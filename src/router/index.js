@@ -75,6 +75,10 @@ const routes = [
           label: '',
           active: ['Admin', 'Article']
         },
+        props: (route) => ({
+          type: route.query.type || 'add',
+          id: route.query.id ? Number(route.query.id) : undefined,
+        }),
         component: () => import('@/views/admin/ArticleManage/edit.vue'),
       },
       {

@@ -18,24 +18,24 @@ export function detail(params) {
   })
 }
 
-// export function add(data) {
-//   return instance_api({
-//     url: import.meta.env.VITE_APP_API+'/article/add',
-//     method: 'post',
-//     data,
-//     auth: true,
-//   })
-// }
-//
-// export function update(data) {
-//   return instance_api({
-//     url: import.meta.env.VITE_APP_API+'/article/update',
-//     method: 'post',
-//     data,
-//     auth: true,
-//   })
-// }
-//
+export function add(data) {
+  return instance_api({
+    url: import.meta.env.VITE_APP_API+'/article/add',
+    method: 'post',
+    data,
+    auth: true,
+  })
+}
+
+export function update(data) {
+  return instance_api({
+    url: import.meta.env.VITE_APP_API+'/article/update',
+    method: 'post',
+    data,
+    auth: true,
+  })
+}
+
 // export function del(data) {
 //   return instance_api({
 //     url: import.meta.env.VITE_APP_API+'/article/delete',

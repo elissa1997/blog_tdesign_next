@@ -1,10 +1,12 @@
 <script setup>
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import dayjs from 'dayjs'
+import { useRouter } from 'vue-router'
 import { list as listArticles } from '@/network/article.js'
 import { getDictOptions } from '@/util/dict.js'
 
 const MIN_TABLE_HEIGHT = 168
+const router = useRouter()
 
 // 页面状态
 const searchData = ref({
@@ -195,7 +197,10 @@ const onPaginationChange = ({ current, pageSize }) => {
 }
 
 const onAdd = () => {
-  // TODO: 预留新增文章事件
+  router.push({
+    name: 'Admin-Article-edit',
+    query: { type: 'add' },
+  })
 }
 
 const onBatchDelete = () => {
@@ -203,7 +208,13 @@ const onBatchDelete = () => {
 }
 
 const onEdit = (row) => {
-  // TODO: 预留编辑文章事件
+  router.push({
+    name: 'Admin-Article-edit',
+    query: {
+      type: 'edit',
+      id: row.id,
+    },
+  })
 }
 
 const onDelete = (row) => {
