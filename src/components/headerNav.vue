@@ -49,7 +49,7 @@ onMounted(() => {
 <template>
 
   <div class="nav">
-    <img src="@/assets/img/logo.png" class="logo" />
+    <img src="@/assets/img/logo.webp" class="logo" />
 
     <div class="navWarp" :class="mobileNavOpen? 'mobileNavOpen':'mobileNavClose'">
       <div
