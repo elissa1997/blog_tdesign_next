@@ -3,6 +3,11 @@ const imageModules = import.meta.glob(
     { eager: true, query: '?url', import: 'default' }
 )
 
+const iconModules = import.meta.glob(
+    '../assets/icon/**/*.{png,jpg,jpeg,webp,gif,svg}',
+    { eager: true, query: '?url', import: 'default' }
+)
+
 /**
  * 获取 src/assets/img 目录下的图片。
  *
@@ -12,6 +17,18 @@ const imageModules = import.meta.glob(
 export function getImgUrl(path) {
     const normalizedPath = String(path).replaceAll('\\', '/').replace(/^\/+/, '')
     return imageModules[`../assets/img/${normalizedPath}`] || ''
+}
+
+
+/**
+ * 获取 src/assets/icon 目录下的图片。
+ *
+ * @param {string} path 相对于 src/assets/icon 的路径
+ * @returns {string}
+ */
+export function getIconUrl(path) {
+    const normalizedPath = String(path).replaceAll('\\', '/').replace(/^\/+/, '')
+    return iconModules[`../assets/icon/${normalizedPath}`] || ''
 }
 
 /**

@@ -5,58 +5,51 @@ import {
   LocationIcon,
   UserIcon,
 } from 'tdesign-icons-vue-next'
-import avatarImg from '@/assets/img/logo.png'
-import coverOne from '@/assets/img/defaultCover/coverbg1.jpg'
-import coverTwo from '@/assets/img/defaultCover/coverbg2.jpg'
-import coverThree from '@/assets/img/defaultCover/coverbg3.jpg'
-import { getImgUrl } from '@/util/tools.js'
+import {getCravatarUrl, getIconUrl, getImgUrl} from '@/util/tools.js'
 
 const profile = {
-  avatar: avatarImg,
-  nickname: 'Hydro',
-  company: '某科技有限公司',
-  role: '前端开发工程师',
-  location: '中国',
-  summary: '关注前端工程化、交互体验和可维护的业务系统建设，喜欢把复杂需求拆成稳定、清晰的产品界面。',
+  nickname: 'Elissa liu',
+  company: '水利行业',
+  role: '前端开发/安卓开发/系统运维',
+  summary: '关注前端工程化、交互体验和可维护的业务系统建设。',
 }
 
 const skills = [
-  { name: 'Vue / Vite', percent: 90, color: 'var(--td-brand-color)', icon: getImgUrl('logo.png') },
-  { name: 'JavaScript / TypeScript', percent: 86, color: 'var(--td-success-color)', icon: getImgUrl('logo.png') },
-  { name: 'TDesign / UI 实现', percent: 82, color: 'var(--td-warning-color)', icon: getImgUrl('logo.png') },
-  { name: 'Node.js / 接口联调', percent: 72, color: 'var(--td-brand-color)', icon: getImgUrl('logo.png') },
-  { name: '工程化 / 性能优化', percent: 78, color: 'var(--td-success-color)', icon: getImgUrl('logo.png') },
+  { name: 'Vue / Vite', percent: 90, color: 'var(--td-brand-color)', icon: getIconUrl('Vue.png') },
+  { name: 'Node.js / 后端', percent: 70, color: 'var(--td-brand-color)', icon: getIconUrl('nodejs.png') },
+  { name: 'Figma / UI', percent: 70, color: 'var(--td-success-color)', icon: getIconUrl('ui.png') },
+  { name: 'ArcGIS Pro / QGIS', percent: 60, color: 'var(--td-warning-color)', icon: getIconUrl('ArcgisPro.png') },
 ]
 
 const projects = [
   {
-    name: '个人技术博客',
-    image: coverOne,
-    tags: ['Vue 3', 'TDesign', 'Markdown'],
+    name: 'All in One 混合架构App',
+    image: getImgUrl('aboutProjects/App.webp'),
+    tags: ['安卓', '移动端', '统一架构'],
     points: [
-      '负责文章列表、详情阅读和评论交互的页面搭建',
-      '接入 Markdown 渲染、代码高亮和分类字典展示',
-      '统一响应式布局，在移动端保持稳定阅读体验',
+      '水利行业系统整合App，原生外壳+webview混合架构，自研JS bridge双向通信桥',
+      '后端多环境网络打通，提供统一公网网关接口',
+      '合规备案与上架、远程调试、开发文档等周边生态建设',
     ],
   },
   {
-    name: '后台内容管理系统',
-    image: coverTwo,
-    tags: ['Admin', 'CRUD', 'Auth'],
+    name: 'HEC-RAS 水动力模拟',
+    image: getImgUrl('aboutProjects/hec-ras.webp'),
+    tags: ['水动力模拟', 'HEC-RAS', '水文计算'],
     points: [
-      '实现文章、评论和字典等核心管理模块',
-      '封装接口请求与权限守卫，减少页面重复逻辑',
-      '优化表单编辑、分页列表和数据加载状态',
+      '实现 HEC-RAS 模拟动态山洪完整过程',
+      '尝试了在不同条件（如水位与流量关系、单位落差和开放边界等）下的计算结果',
+      '通过Node.js 对输出数据进行批量清理，并导出到 ArcGIS Pro 完成数据可视化',
     ],
   },
   {
-    name: '可视化展示页面',
-    image: coverThree,
-    tags: ['Data', 'Responsive', 'UX'],
+    name: 'Mike21 水文计算',
+    image: getImgUrl('aboutProjects/Mike21.webp'),
+    tags: ['水文计算', 'Mike21', '数据可视化'],
     points: [
-      '参与页面信息架构与组件拆分',
-      '结合业务数据设计卡片、图表和状态提示',
-      '兼顾桌面端展示密度与移动端触控体验',
+      '对某区域倾斜摄影的数字高程模型（DEM）数据提取与预处理',
+      '使用水位-流量关系曲线，在二维水力模型中模拟并计算了山洪情况',
+      '将计算结果导出为SHP文件，并使用ArcGIS for JS进行可视化展示',
     ],
   },
 ]
@@ -75,7 +68,7 @@ const projects = [
         <div class="about-wrap">
           <section class="profile-card panel">
             <div class="profile-main">
-              <t-avatar :image="profile.avatar" size="96px" class="avatar" />
+              <t-avatar :image="getCravatarUrl('524948583@qq.com')" size="96px" class="avatar" />
               <div class="profile-info">
                 <div class="name-row">
                   <h1>{{ profile.nickname }}</h1>
@@ -90,10 +83,6 @@ const projects = [
                   <span>
                     <user-icon />
                     {{ profile.role }}
-                  </span>
-                  <span>
-                    <location-icon />
-                    {{ profile.location }}
                   </span>
                 </div>
               </div>
