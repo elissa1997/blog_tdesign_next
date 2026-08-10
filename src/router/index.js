@@ -36,6 +36,16 @@ const routes = [
     },
     component: () => import('@/views/about.vue')
   },
+  {
+    path: '/links',
+    name: 'Links',
+    meta: {
+      auth: false,
+      label: '友情链接',
+      active: ['Links']
+    },
+    component: () => import('@/views/links.vue')
+  },
 
   {
     path: '/login',
@@ -110,6 +120,16 @@ const routes = [
           active: ['Admin', 'Dict']
         },
         component: () => import('@/views/admin/DictManage/list.vue'),
+      },
+      {
+        path: 'linklist',
+        name: 'Admin-Link-List',
+        meta: {
+          auth: true,
+          label: '友情链接管理',
+          active: ['Admin', 'Link']
+        },
+        component: () => import('@/views/admin/LinkManage/list.vue'),
       },
     ]
   }
