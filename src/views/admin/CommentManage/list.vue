@@ -9,7 +9,6 @@ import {
 
 <template>
   <CommentManageList
-    kind="article"
     :list-request="adminList"
     :update-request="updateStatus"
     :delete-request="del"

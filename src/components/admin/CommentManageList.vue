@@ -5,11 +5,6 @@ import { MessagePlugin } from 'tdesign-vue-next'
 import { getDictOptions } from '@/util/dict.js'
 
 const props = defineProps({
-  kind: {
-    type: String,
-    required: true,
-    validator: (value) => ['article', 'other'].includes(value),
-  },
   listRequest: {
     type: Function,
     required: true,
@@ -25,7 +20,6 @@ const props = defineProps({
 })
 
 const MIN_TABLE_HEIGHT = 168
-const isOtherComment = computed(() => props.kind === 'other')
 
 const searchData = ref(createEmptySearch())
 const statusOptions = ref([])
@@ -59,9 +53,7 @@ let resizeFrameId = null
 const columns = computed(() => [
   { colKey: 'row-select', type: 'multiple', width: 50 },
   { colKey: 'id', title: 'ID', width: 70 },
-  ...(isOtherComment.value
-    ? [{ colKey: 'type', title: '类型', width: 80, align: 'center' }]
-    : [{ colKey: 'a_id', title: '文章 ID', width: 90, align: 'center' }]),
+  { colKey: 'a_id', title: '文章 ID', width: 90, align: 'center' },
   { colKey: 'user_name', title: '评论人', width: 120, ellipsis: true },
   { colKey: 'email', title: '邮箱', width: 180, ellipsis: true },
   { colKey: 'text', title: '评论内容', minWidth: 240, ellipsis: true },
@@ -157,9 +149,7 @@ const getListParams = () => {
     limits: pagination.value.pageSize,
   }
   const search = {}
-  const targetKey = isOtherComment.value ? 'type' : 'a_id'
-
-  if (searchData.value.target !== '') search[targetKey] = Number(searchData.value.target)
+  if (searchData.value.target !== '') search.a_id = Number(searchData.value.target)
   if (searchData.value.status !== '') search.status = searchData.value.status
   for (const key of ['user_name', 'email', 'text']) {
     const value = searchData.value[key].trim()
@@ -214,10 +204,7 @@ const onStatusChange = async (row, status) => {
   updatingIds.value.push(row.id)
   try {
     const response = await props.updateRequest({ id: row.id, status })
-    // 其它评论更新接口的 200 响应在 Apifox 中定义为空对象。
-    const isSuccess = response?.status === 200
-      || (isOtherComment.value && response && response.status === undefined && response.success !== false)
-    if (!isSuccess) {
+    if (response?.status !== 200) {
       throw new Error(response?.msg || response?.message || '更新评论状态失败')
     }
     MessagePlugin.success('评论状态已更新')
@@ -300,12 +287,12 @@ onBeforeUnmount(stopHeightObserver)
         @reset="searchReset"
         @submit="searchSubmit"
       >
-        <t-form-item :label="isOtherComment ? '评论类型' : '文章 ID'" name="target">
+        <t-form-item label="文章 ID" name="target">
           <t-input-number
             v-model="searchData.target"
             :min="0"
             :decimal-places="0"
-            :placeholder="isOtherComment ? '请输入评论类型' : '请输入文章 ID'"
+            placeholder="请输入文章 ID"
           />
         </t-form-item>
         <t-form-item label="评论人" name="user_name">
