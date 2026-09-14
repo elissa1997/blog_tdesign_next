@@ -1,8 +1,9 @@
 <script setup>
 import {onMounted, ref} from "vue";
-import { LinkIcon } from 'tdesign-icons-vue-next';
+import { LinkIcon, JumpIcon } from 'tdesign-icons-vue-next';
 import {listFront, add} from "@/network/links.js";
 import {MessagePlugin} from "tdesign-vue-next";
+import {getUrlHostname} from "@/util/tools.js";
 
 const links = ref({
   data:[],
@@ -85,14 +86,19 @@ onMounted(() => {
           :xl="{ offset: 3, span: 6 }"
       >
 
+        <div class="title">
+          <div class="eng">Links</div>
+          <div class="zh">友情链接</div>
+        </div>
+
         <div class="linksList">
           <t-row :gutter="[16, 16]">
             <t-col
-                :xs="{ offset: 0, span: 6 }"
-                :sm="{ offset: 0, span: 6 }"
+                :xs="{ offset: 0, span: 12 }"
+                :sm="{ offset: 0, span: 12 }"
                 :md="{ offset: 0, span: 4 }"
-                :lg="{ offset: 0, span: 3 }"
-                :xl="{ offset: 0, span: 3 }"
+                :lg="{ offset: 0, span: 4 }"
+                :xl="{ offset: 0, span: 4 }"
                 v-for="item in links.data"
                 :key="item.id"
             >
@@ -105,16 +111,17 @@ onMounted(() => {
                   @error="() => faviconError(item)"
                 >
 
-                <t-avatar v-else size="40px"> {{item.name.substring(0,1)}} </t-avatar>
+                <t-avatar v-else shape="round" size="50px"> {{item.name.substring(0,1)}} </t-avatar>
 
                 <div class="text">
                   <div class="name">{{item.name}}</div>
-                  <t-link theme="primary" :href="item.url" target="_self">
-                    <template #prefix-icon>
-                      <link-icon />
-                    </template>
-                    传送门
-                  </t-link>
+                  <div class="domain">
+                    <link-icon />
+                    <span>{{getUrlHostname(item.url)}}</span>
+                  </div>
+                </div>
+                <div class="linkIconWarp">
+                  <jump-icon/>
                 </div>
               </div>
             </t-col>
@@ -133,7 +140,7 @@ onMounted(() => {
         </div>
 
         <div class="linkAdd">
-
+          <div class="addTitle">申请友情链接</div>
           <t-alert theme="warning">
             <template #message>添加友情链接有频率限制，请勿频繁提交</template>
           </t-alert>
@@ -154,11 +161,35 @@ onMounted(() => {
 
 <style scoped lang="scss">
   .links {
+
+    .title {
+      margin: var(--td-comp-margin-xxl) var(--td-comp-margin-s) var(--td-comp-margin-s) var(--td-comp-margin-s);
+      .eng {
+        display: flex;
+        align-items: center;
+        color: var(--td-brand-color);
+        margin-bottom: var(--td-comp-paddingTB-m);
+      }
+      .eng::before {
+        content: " ";
+        width: 4px;
+        height: 16px;
+        background-color: var(--td-brand-color);
+        margin-right: 10px;
+        display: inline-block;
+      }
+      .zh {
+        font-size: var(--td-font-size-body-large);
+        font-weight: bold;
+        color: var(--td-text-color-primary);
+      }
+    }
+
     .linksList {
-      padding: var(--td-comp-paddingTB-xxl) var(--td-comp-paddingLR-s);
+      padding: var(--td-comp-paddingTB-l) var(--td-comp-paddingLR-s);
       box-sizing: border-box;
-      max-height: 445px;
-      overflow-y: auto;
+      //max-height: 445px;
+      //overflow-y: auto;
       .linksItem {
         padding: var(--td-comp-paddingTB-xl) var(--td-comp-paddingLR-xl);
         box-sizing: border-box;
@@ -176,11 +207,12 @@ onMounted(() => {
         }
 
         .linksIcon {
-          $size: 40px;
+          $size: 50px;
           width: $size;
           height: $size;
-          border-radius: 50%;
-          box-shadow: 0 0 8px var(--td-brand-color-4);
+          border-radius: var(--td-radius-medium);
+          padding: var(--td-size-2);
+          box-sizing: border-box;
         }
 
         .text {
@@ -197,8 +229,33 @@ onMounted(() => {
             color: var(--td-text-color-primary);
             margin-bottom: var(--td-comp-paddingTB-xs);
 
-
           }
+
+          .domain {
+            color: var(--td-text-color-placeholder);
+            font-size: var(--td-font-size-link-medium);
+            display: flex;
+            align-items: center;
+            // 自动省略
+            span {
+              width: calc(100% - 20px);
+              overflow: hidden;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+              margin-left: var(--td-size-2);
+            }
+          }
+        }
+
+        .linkIconWarp {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-left: var(--td-size-3);
+          padding: var(--td-comp-paddingTB-xs);
+          box-sizing: border-box;
+          border: 1px solid var(--td-component-border);
+          border-radius: var(--td-radius-medium);
         }
       }
     }
@@ -209,30 +266,42 @@ onMounted(() => {
     }
 
     .linkAdd {
-      padding: var(--td-comp-paddingTB-xxl) var(--td-comp-paddingLR-s);
+      margin: var(--td-comp-margin-l) var(--td-comp-margin-s) var(--td-comp-margin-l) var(--td-comp-margin-s);
+      padding: var(--td-comp-paddingTB-xl) var(--td-comp-paddingLR-xl);
       box-sizing: border-box;
+      overflow: hidden;
+      border-radius: var(--td-radius-medium);
+      background-color: var(--td-bg-color-container);
+      box-shadow: var(--card-shadow);
+      transition: box-shadow .2s ease, transform .2s ease;
 
-      margin-top: var(--td-comp-margin-l);
+      &:hover {
+        box-shadow: var(--card-shadow-hover);
+        transform: translateY(-2px);
+      }
+
+      .addTitle {
+        font-size: var(--td-font-size-body-large);
+        font-weight: bold;
+        color: var(--td-brand-color);
+        margin-bottom: var(--td-comp-paddingTB-l);
+        display: flex;
+        align-items: center;
+      }
+
+      .addTitle::before {
+        content: " ";
+        width: 4px;
+        height: 16px;
+        background-color: var(--td-brand-color);
+        margin-right: 10px;
+        display: inline-block;
+      }
 
       .input {
         display: flex;
         gap: var(--td-size-6);
-
-        padding: var(--td-comp-paddingTB-xl) var(--td-comp-paddingLR-xl);
-        box-sizing: border-box;
-        overflow: hidden;
-        border-radius: var(--td-radius-medium);
-        background-color: var(--td-bg-color-container);
-        box-shadow: var(--card-shadow);
-        transition: box-shadow .2s ease, transform .2s ease;
-
         margin-top: var(--td-comp-margin-l);
-
-
-        &:hover {
-          box-shadow: var(--card-shadow-hover);
-          transform: translateY(-2px);
-        }
 
         @include respond-to('desktop') {
           align-items: center;

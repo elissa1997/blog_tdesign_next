@@ -32,6 +32,26 @@ export function getIconUrl(path) {
 }
 
 /**
+ * 从 URL 中提取完整域名，移除协议、端口、路径、查询参数和锚点。
+ *
+ * @param {string} value URL 地址
+ * @returns {string} 完整域名，无法解析时返回空字符串
+ */
+export function getUrlHostname(value = '') {
+    if (typeof value !== 'string' || !value.trim()) return ''
+
+    const normalizedUrl = /^[a-z][a-z\d+.-]*:\/\//i.test(value.trim())
+        ? value.trim()
+        : `https://${value.trim()}`
+
+    try {
+        return new URL(normalizedUrl).hostname
+    } catch {
+        return ''
+    }
+}
+
+/**
  * 将 Markdown 文本转换为适合卡片预览的纯文本。
  *
  * @param {string} markdown Markdown 内容
