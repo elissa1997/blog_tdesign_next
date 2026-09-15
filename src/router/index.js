@@ -102,6 +102,16 @@ const routes = [
         component: () => import('@/views/admin/CommentManage/list.vue'),
       },
       {
+        path: 'userlist',
+        name: 'Admin-User-list',
+        meta: {
+          auth: true,
+          label: '用户管理',
+          active: ['Admin', 'User']
+        },
+        component: () => import('@/views/admin/UserManage/list.vue'),
+      },
+      {
         path: 'dictlist',
         name: 'Admin-Dict-List',
         meta: {
