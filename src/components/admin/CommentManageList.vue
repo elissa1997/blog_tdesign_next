@@ -2,7 +2,8 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import dayjs from 'dayjs'
 import { MessagePlugin } from 'tdesign-vue-next'
-import { getDictOptions } from '@/util/dict.js'
+import { getDictOptionLabel } from '@/util/dict.js'
+import { useDictStore } from '@/store/dict.js'
 
 const props = defineProps({
   listRequest: {
@@ -20,9 +21,11 @@ const props = defineProps({
 })
 
 const MIN_TABLE_HEIGHT = 168
+const dictStore = useDictStore()
 
 const searchData = ref(createEmptySearch())
-const statusOptions = ref([])
+const statusOptions = computed(() => dictStore.optionsByType('状态'))
+const qiniuOptions = computed(() => dictStore.optionsByType('七牛审核结果'))
 const tableData = ref([])
 const selectedRowKeys = ref([])
 const loading = ref(false)
@@ -58,6 +61,7 @@ const columns = computed(() => [
   { colKey: 'email', title: '邮箱', width: 180, ellipsis: true },
   { colKey: 'text', title: '评论内容', minWidth: 240, ellipsis: true },
   { colKey: 'status', title: '状态', width: 130, align: 'center' },
+  { colKey: 'qiniuSuggestion', title: '内容审核', width: 110, align: 'center' },
   { colKey: 'createdAt', title: '创建时间', width: 160 },
   { colKey: 'operation', title: '操作', width: 220, align: 'center', fixed: 'right' },
 ])
@@ -69,6 +73,7 @@ function createEmptySearch() {
     user_name: '',
     email: '',
     text: '',
+    qiniuSuggestion: '',
   }
 }
 
@@ -76,15 +81,25 @@ const formatDate = (value) => {
   return value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-'
 }
 
-const isSameStatus = (left, right) => String(left) === String(right)
+const isSameStatus = (left, right) => left === right
 
 const getStatusLabel = (status) => {
-  return statusOptions.value.find((item) => isSameStatus(item.value, status))?.label ?? '未知'
+  return getDictOptionLabel(statusOptions.value, status, '未知')
 }
 
 const getStatusTheme = (status) => {
-  return Number(status) === 1 ? 'success' : 'default'
+  return status === '1' ? 'success' : 'default'
 }
+
+const getQiniuLabel = (suggestion) => {
+  return getDictOptionLabel(qiniuOptions.value, suggestion, '未知')
+}
+
+const getQiniuTheme = (suggestion) => ({
+  pass: 'success',
+  review: 'warning',
+  block: 'danger',
+}[suggestion] || 'default')
 
 const getAvailableStatusOptions = (status) => {
   return statusOptions.value.filter((item) => !isSameStatus(item.value, status))
@@ -151,6 +166,9 @@ const getListParams = () => {
   const search = {}
   if (searchData.value.target !== '') search.a_id = Number(searchData.value.target)
   if (searchData.value.status !== '') search.status = searchData.value.status
+  if (searchData.value.qiniuSuggestion !== '') {
+    search.qiniuSuggestion = searchData.value.qiniuSuggestion
+  }
   for (const key of ['user_name', 'email', 'text']) {
     const value = searchData.value[key].trim()
     if (value) search[key] = value
@@ -260,12 +278,7 @@ const stopHeightObserver = () => {
 }
 
 onMounted(async () => {
-  const results = await Promise.allSettled([getDictOptions('状态'), getList()])
-  if (results[0].status === 'fulfilled') {
-    statusOptions.value = results[0].value
-  } else {
-    MessagePlugin.error(results[0].reason?.message || '获取状态字典失败')
-  }
+  await getList()
   await nextTick()
   startHeightObserver()
 })
@@ -311,6 +324,13 @@ onBeforeUnmount(stopHeightObserver)
             placeholder="请选择状态"
           />
         </t-form-item>
+        <t-form-item label="内容审核" name="qiniuSuggestion">
+          <t-select
+            v-model="searchData.qiniuSuggestion"
+            :options="qiniuOptions"
+            placeholder="请选择审核结果"
+          />
+        </t-form-item>
         <t-form-item>
           <t-space size="10px">
             <t-button theme="primary" type="submit">查询</t-button>
@@ -354,6 +374,11 @@ onBeforeUnmount(stopHeightObserver)
               {{ getStatusLabel(row.status) }}
             </t-tag>
           </template>
+          <template #qiniuSuggestion="{ row }">
+            <t-tag :theme="getQiniuTheme(row.qiniuSuggestion)" variant="light">
+              {{ getQiniuLabel(row.qiniuSuggestion) }}
+            </t-tag>
+          </template>
           <template #createdAt="{ row }">
             {{ formatDate(row.createdAt) }}
           </template>
@@ -362,7 +387,7 @@ onBeforeUnmount(stopHeightObserver)
               <t-button
                 v-for="option in getAvailableStatusOptions(row.status)"
                 :key="option.value"
-                :theme="Number(option.value) === 1 ? 'success' : 'default'"
+                :theme="option.value === '1' ? 'success' : 'default'"
                 size="small"
                 :loading="updatingIds.includes(row.id)"
                 :disabled="updatingIds.includes(row.id)"
