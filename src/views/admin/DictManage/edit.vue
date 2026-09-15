@@ -50,7 +50,7 @@ function createEmptyForm() {
     dict_type: '',
     update_dict_type: '',
     name: '',
-    value: 0,
+    value: '',
   }
 }
 
@@ -63,7 +63,7 @@ const resetForm = () => {
     dict_type: dictType,
     update_dict_type: dictType,
     name: row.name ?? '',
-    value: row.value ?? 0,
+    value: row.value ?? '',
   }
 
   void nextTick(() => {
@@ -72,7 +72,7 @@ const resetForm = () => {
 }
 
 const buildSubmitData = () => {
-  const value = Number(formData.value.value)
+  const value = formData.value.value.trim()
 
   if (isEditType.value) {
     return {
@@ -148,11 +148,10 @@ watch(
     </t-form-item>
 
     <t-form-item v-if="!isEditType" label="字典值" name="value">
-      <t-input-number
+      <t-input
         v-model="formData.value"
-        :decimal-places="0"
+        :maxlength="191"
         placeholder="请输入字典值"
-        style="width: 100%"
       />
     </t-form-item>
 

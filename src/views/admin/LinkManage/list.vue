@@ -1,24 +1,18 @@
 <script setup>
-import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import dayjs from 'dayjs'
 import { MessagePlugin } from 'tdesign-vue-next'
 import LinkEdit from './edit.vue'
 import { del, listAdmin } from '@/network/links.js'
-import { getDictOptions } from '@/util/dict.js'
+import { getDictOptionLabel } from '@/util/dict.js'
+import { useDictStore } from '@/store/dict.js'
 
 const MIN_TABLE_HEIGHT = 168
-const DEFAULT_STATUS_OPTIONS = [
-  { label: '待审核', value: 0 },
-  { label: '已通过', value: 1 },
-]
-const QINIU_OPTIONS = [
-  { label: '通过', value: 'pass' },
-  { label: '待复核', value: 'review' },
-  { label: '拦截', value: 'block' },
-]
+const dictStore = useDictStore()
 
 const searchData = ref(createEmptySearch())
-const statusOptions = ref(DEFAULT_STATUS_OPTIONS)
+const statusOptions = computed(() => dictStore.optionsByType('状态'))
+const qiniuOptions = computed(() => dictStore.optionsByType('七牛审核结果'))
 const tableData = ref([])
 const selectedRowKeys = ref([])
 const loading = ref(false)
@@ -71,16 +65,14 @@ function createEmptySearch() {
   }
 }
 
-const isSameValue = (left, right) => String(left) === String(right)
-
 const getStatusLabel = (status) => {
-  return statusOptions.value.find((item) => isSameValue(item.value, status))?.label ?? '未知'
+  return getDictOptionLabel(statusOptions.value, status, '未知')
 }
 
-const getStatusTheme = (status) => Number(status) === 1 ? 'success' : 'default'
+const getStatusTheme = (status) => status === '1' ? 'success' : 'default'
 
 const getQiniuLabel = (suggestion) => {
-  return QINIU_OPTIONS.find((item) => item.value === suggestion)?.label ?? suggestion ?? '-'
+  return getDictOptionLabel(qiniuOptions.value, suggestion, '未知')
 }
 
 const getQiniuTheme = (suggestion) => ({
@@ -193,15 +185,6 @@ const reloadList = async () => {
   }
 }
 
-const loadStatusOptions = async () => {
-  try {
-    const options = await getDictOptions('状态')
-    if (options.length > 0) statusOptions.value = options
-  } catch (error) {
-    MessagePlugin.warning(error?.message || '状态字典加载失败，已使用默认选项')
-  }
-}
-
 const searchReset = () => {
   searchData.value = createEmptySearch()
   pagination.value.current = 1
@@ -281,7 +264,7 @@ const stopHeightObserver = () => {
 }
 
 onMounted(async () => {
-  await Promise.all([loadStatusOptions(), getLinkList()])
+  await getLinkList()
   await nextTick()
   startHeightObserver()
 })
@@ -322,7 +305,7 @@ onBeforeUnmount(stopHeightObserver)
         <t-form-item label="内容审核" name="qiniuSuggestion">
           <t-select
             v-model="searchData.qiniuSuggestion"
-            :options="QINIU_OPTIONS"
+            :options="qiniuOptions"
             placeholder="请选择审核结果"
           />
         </t-form-item>

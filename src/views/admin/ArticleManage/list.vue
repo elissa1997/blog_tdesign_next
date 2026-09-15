@@ -1,12 +1,14 @@
 <script setup>
-import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import dayjs from 'dayjs'
 import { useRouter } from 'vue-router'
 import { list as listArticles } from '@/network/article.js'
-import { getDictOptions } from '@/util/dict.js'
+import { getDictOptionLabel } from '@/util/dict.js'
+import { useDictStore } from '@/store/dict.js'
 
 const MIN_TABLE_HEIGHT = 168
 const router = useRouter()
+const dictStore = useDictStore()
 
 // 页面状态
 const searchData = ref({
@@ -14,10 +16,10 @@ const searchData = ref({
   category: '',
   status: '',
 })
-const dictOptions = ref({
-  category: [],
-  status: [],
-})
+const dictOptions = computed(() => ({
+  category: dictStore.optionsByType('文章类型'),
+  status: dictStore.optionsByType('状态'),
+}))
 const tableData = ref([])
 const selectedRowKeys = ref([])
 const loading = ref(false)
@@ -53,17 +55,8 @@ const columns = [
   { colKey: 'operation', title: '操作', width: 160, align: 'center' },
 ]
 
-const loadDictOptions = async () => {
-  const [category, status] = await Promise.all([
-    getDictOptions('文章类型'),
-    getDictOptions('状态'),
-  ])
-
-  dictOptions.value = { category, status }
-}
-
 const getOptionLabel = (optionList, value, fallback = '-') => {
-  return optionList.find((item) => item.value === value)?.label ?? fallback
+  return getDictOptionLabel(optionList, value, fallback)
 }
 
 const formatDate = (value) => {
@@ -250,10 +243,7 @@ const stopHeightObserver = () => {
 }
 
 onMounted(async () => {
-  await Promise.allSettled([
-    loadDictOptions(),
-    getArticleList(),
-  ])
+  await getArticleList()
 
   await nextTick()
 
@@ -339,11 +329,11 @@ onBeforeUnmount(stopHeightObserver)
           @page-change="onPaginationChange"
         >
           <template #category="{ row }">
-            {{ getOptionLabel(dictOptions.category, row.category, '未分类') }}
+            {{ getOptionLabel(dictOptions.category, row.category) }}
           </template>
 
           <template #status="{ row }">
-            <t-tag :theme="row.status === 1 ? 'success' : 'default'" variant="light">
+            <t-tag :theme="row.status === '1' ? 'success' : 'default'" variant="light">
               {{ getOptionLabel(dictOptions.status, row.status) }}
             </t-tag>
           </template>

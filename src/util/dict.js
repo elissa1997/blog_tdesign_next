@@ -10,7 +10,7 @@ const DEFAULT_PAGE_SIZE = 100
  *
  * @param {string} dictType 字典类型
  * @param {{ offset?: number, limits?: number }} [pagination] 分页参数
- * @returns {Promise<Array<{ id: number, dict_type: string, name: string, value: number }>>}
+ * @returns {Promise<Array<{ id: number, dict_type: string, name: string, value: string }>>}
  */
 export async function getDictItems(
   dictType,
@@ -36,8 +36,8 @@ export async function getDictItems(
 /**
  * 将后端字典项转换为 TDesign Select 等组件可直接使用的选项。
  *
- * @param {Array<{ name: string, value: unknown }>} items 字典项
- * @returns {Array<{ label: string, value: unknown }>}
+ * @param {Array<{ name: string, value: string }>} items 字典项
+ * @returns {Array<{ label: string, value: string }>}
  */
 export function toDictOptions(items = []) {
   if (!Array.isArray(items)) {
@@ -55,17 +55,30 @@ export function toDictOptions(items = []) {
  *
  * @param {string} dictType 字典类型
  * @param {{ offset?: number, limits?: number }} [pagination] 分页参数
- * @returns {Promise<Array<{ label: string, value: unknown }>>}
+ * @returns {Promise<Array<{ label: string, value: string }>>}
  */
 export async function getDictOptions(dictType, pagination) {
   return toDictOptions(await getDictItems(dictType, pagination))
 }
 
 /**
+ * 根据 value 获取组件选项的展示名称。
+ *
+ * @param {Array<{ label: string, value: string }>} options 组件选项
+ * @param {string} value 字典值
+ * @param {string} [fallback=''] 未匹配时返回值
+ * @returns {string}
+ */
+export function getDictOptionLabel(options, value, fallback = '') {
+  if (!Array.isArray(options)) return fallback
+  return options.find((item) => item.value === value)?.label ?? fallback
+}
+
+/**
  * 根据 value 获取字典名称。
  *
- * @param {Array<{ name: string, value: unknown }>} items 字典项
- * @param {unknown} value 字典值
+ * @param {Array<{ name: string, value: string }>} items 字典项
+ * @param {string} value 字典值
  * @param {string} [fallback=''] 未匹配时返回值
  * @returns {string}
  */
@@ -77,10 +90,10 @@ export function getDictLabel(items, value, fallback = '') {
 /**
  * 根据名称获取字典值。
  *
- * @param {Array<{ name: string, value: unknown }>} items 字典项
+ * @param {Array<{ name: string, value: string }>} items 字典项
  * @param {string} label 字典名称
- * @param {unknown} [fallback] 未匹配时返回值
- * @returns {unknown}
+ * @param {string} [fallback] 未匹配时返回值
+ * @returns {string | undefined}
  */
 export function getDictValue(items, label, fallback) {
   if (!Array.isArray(items)) return fallback

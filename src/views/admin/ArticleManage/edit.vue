@@ -3,7 +3,7 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { MessagePlugin } from 'tdesign-vue-next'
 import { add, detail, update } from '@/network/article.js'
-import { getDictOptions } from '@/util/dict.js'
+import { useDictStore } from '@/store/dict.js'
 import MarkdownPreview from '@/components/MarkdownPreview/index.vue'
 
 const props = defineProps({
@@ -19,14 +19,15 @@ const props = defineProps({
 })
 
 const router = useRouter()
+const dictStore = useDictStore()
 
 const formRef = ref(null)
 const loading = ref(false)
 const submitting = ref(false)
-const dictOptions = ref({
-  category: [],
-  status: [],
-})
+const dictOptions = computed(() => ({
+  category: dictStore.optionsByType('文章类型'),
+  status: dictStore.optionsByType('状态'),
+}))
 const formData = ref(createEmptyForm())
 
 const isEdit = computed(() => props.type === 'edit')
@@ -42,8 +43,8 @@ function createEmptyForm() {
     id: undefined,
     title: '',
     cover: '',
-    category: undefined,
-    status: 1,
+    category: '',
+    status: '1',
     content: '',
   }
 }
@@ -52,15 +53,6 @@ const resetValidate = () => {
   void nextTick(() => {
     formRef.value?.clearValidate?.()
   })
-}
-
-const loadDictOptions = async () => {
-  const [category, status] = await Promise.all([
-    getDictOptions('文章类型'),
-    getDictOptions('状态'),
-  ])
-
-  dictOptions.value = { category, status }
 }
 
 const loadArticleDetail = async () => {
@@ -89,8 +81,8 @@ const loadArticleDetail = async () => {
       id: article.id,
       title: article.title ?? '',
       cover: article.cover ?? '',
-      category: article.category,
-      status: article.status ?? 1,
+      category: article.category ?? '',
+      status: article.status ?? '1',
       content: article.content ?? '',
     }
     resetValidate()
@@ -148,10 +140,7 @@ watch(
 )
 
 onMounted(async () => {
-  await Promise.allSettled([
-    loadDictOptions(),
-    loadArticleDetail(),
-  ])
+  await loadArticleDetail()
 })
 </script>
 
@@ -183,6 +172,7 @@ onMounted(async () => {
                 :options="dictOptions.category"
                 placeholder="请选择文章分类"
                 clearable
+                @clear="formData.category = ''"
               />
             </t-form-item>
 

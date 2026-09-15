@@ -4,8 +4,10 @@ import dayjs from 'dayjs'
 import { MessagePlugin } from 'tdesign-vue-next'
 import DictEdit from './edit.vue'
 import { del, list as listDicts } from '@/network/dict.js'
+import { useDictStore } from '@/store/dict.js'
 
 const MIN_TABLE_HEIGHT = 168
+const dictStore = useDictStore()
 
 const searchData = ref({
   dict_type: '',
@@ -180,6 +182,14 @@ const reloadList = async () => {
   }
 }
 
+const refreshDictCache = async () => {
+  try {
+    await dictStore.load(true)
+  } catch (error) {
+    MessagePlugin.error(error?.message || '刷新字典缓存失败')
+  }
+}
+
 const searchReset = () => {
   searchData.value = {
     dict_type: '',
@@ -289,6 +299,7 @@ const confirmDelete = async () => {
     deleteDialogVisible.value = false
     pendingDelete.value = createEmptyDelete()
     await reloadList()
+    await refreshDictCache()
   } catch (error) {
     MessagePlugin.error(error?.message || '删除字典失败')
   } finally {
@@ -303,6 +314,7 @@ const closeDialog = () => {
 const onEditSuccess = async () => {
   closeDialog()
   await reloadList()
+  await refreshDictCache()
 }
 
 const startHeightObserver = () => {

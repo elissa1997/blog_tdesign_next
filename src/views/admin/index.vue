@@ -1,9 +1,12 @@
 <script setup>
 import {useRoute, useRouter} from "vue-router";
 import {computed, onMounted, ref} from "vue";
+import { MessagePlugin } from 'tdesign-vue-next'
+import { useDictStore } from '@/store/dict.js'
 
 const router = useRouter()
 const route = useRoute()
+const dictStore = useDictStore()
 
 const navList = ref([])
 const getNavList = () => {
@@ -19,8 +22,13 @@ const menuClick = (item) => {
   router.push(item.path)
 }
 
-onMounted(() => {
+onMounted(async () => {
   getNavList()
+  try {
+    await dictStore.load()
+  } catch (error) {
+    MessagePlugin.error(error?.message || '获取字典列表失败')
+  }
 })
 </script>
 
